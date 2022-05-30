@@ -5,7 +5,7 @@ library(ape)
 simul_data <- function(nspec = 200, nisl = 20){
   spec <- paste0("Spec_", 1:nspec)
   fam <- sample(LETTERS[1:10], nspec, replace = TRUE)
-  t_spe <- rbinom(nspec, 1, 0.2)
+  t_spe <- rbinom(nspec, 1, 0.3)
   t_clo <- rbinom(nspec, 1, 0.5)
   t_bud_d <- rnorm(nspec, 4)
   t_bud_n <- rnorm(nspec, 22, 3)
@@ -16,8 +16,9 @@ simul_data <- function(nspec = 200, nisl = 20){
     Depth_of_the_belowground_bud_bank_with_root_buds_included = t_bud_d,
     Size_of_the_belowground_bud_bank_with_root_buds_included = t_bud_n,
     Lateral_spreading_distance_by_clonal_growth = t_las)
-  pres <- data.frame(lapply(spec, function(x, nisl) rbinom(nisl, 1, 0.3), nisl))
-  colnames(pres) <- spec 
+  pres <- cbind(ID = paste0("ID", 1:nisl),
+    data.frame(lapply(spec, function(x, nisl) rbinom(nisl, 1, 0.3), nisl)))
+  colnames(pres) <- c("ID", spec) 
   ins <- data.frame(TE = rnorm(nisl, 5))
   list(splist = splist, traits = traits, pres = pres, ins = ins)
 }
