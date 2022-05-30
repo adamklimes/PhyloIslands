@@ -1,4 +1,5 @@
-# data_simulation
+## data_simulation
+# very simple simulation of required data structure (no phylogenetic signal)
 library(ape)
 
 simul_data <- function(nspec = 200, nisl = 20){
