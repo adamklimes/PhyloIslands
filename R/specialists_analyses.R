@@ -84,13 +84,13 @@ calc_phydist <- function(x, dat, phy, splist, R = 9999){
   selections <- sapply(1:R, function(x) sample(phy_all$tip.label, length(sel_spec)))  
   rowSums(apply(selections, 2, phylodist_funs, phy) < phylodist_funs(sel_spec, phy)) / (R + 1)
 }
-
-pd_fe <- data.frame(t(apply(fe$pres[, -1], 1, calc_phydist, fe$pres[, -1], 
-    phy_fe, fe$splist)))
-pd_oc <- data.frame(t(apply(oc$pres[, -1], 1, calc_phydist, oc$pres[, -1], 
-    phy_oc, oc$splist)))
-pd_mt <- data.frame(t(apply(mt$pres[, -1], 1, calc_phydist, mt$pres[, -1], 
-    phy_mt, mt$splist)))
+aux_calc_phydist <- function(dat, phy){
+  data.frame(t(apply(dat$pres[, -1], 1, calc_phydist, dat$pres[, -1], 
+    phy, dat$splist)))
+}
+pd_fe <- aux_calc_phydist(fe, phy_fe)
+pd_oc <- aux_calc_phydist(fe, phy_oc)
+pd_mt <- aux_calc_phydist(fe, phy_mt)
 
 phyd_ins <- function(phyd, ins, col, xt = NULL, yt){
   points(phyd ~ ins, col = col)
@@ -168,7 +168,10 @@ aux_lm(mt$ins$TE, nspec_mt[, 2], xlab = "Target effect", ylab = "Number of speci
 aux_lm(mt$ins$TE, nspec_mt[, 2]/nspec_mt[, 1], xlab = "Target effect", ylab = "Proportion of specialists")
 
 # H3 and H4
-calc_com <- function(tr, pres, splist, traits, phy){
+calc_com <- function(tr, dat, phy){
+  pres <- dat$pres
+  splist <- dat$splist
+  traits <- dat$traits
   bin <- tr == "clon"
   onlyclon <- tr == "Lateral_spreading_distance_by_clonal_growth"
   sp_spec <- splist$pm_names[splist$Specialist > 0.5]
@@ -208,14 +211,14 @@ calc_com <- function(tr, pres, splist, traits, phy){
   list(means = means, physig = mod_out)
 }
 
-clon_fe <- with(fe, calc_com("clon", pres, splist, traits, phy_fe))
-clon_oc <- with(oc, calc_com("clon", pres, splist, traits, phy_oc))
-clon_mt <- with(mt, calc_com("clon", pres, splist, traits, phy_mt))
+clon_fe <- calc_com("clon", fe, phy_fe)
+clon_oc <- calc_com("clon", oc, phy_oc)
+clon_mt <- calc_com("clon", mt, phy_mt)
 vars <- c("Size_of_the_belowground_bud_bank_with_root_buds_included",
   "Depth_of_the_belowground_bud_bank_with_root_buds_included",
   "Lateral_spreading_distance_by_clonal_growth")
-est_fe <- with(fe, lapply(vars, calc_com, pres, splist, traits, phy_fe))
-est_oc <- with(oc, lapply(vars, calc_com, pres, splist, traits, phy_oc))
+est_fe <- lapply(vars, calc_com, fe, phy_fe)
+est_oc <- lapply(vars, calc_com, oc, phy_oc)
 est_fe[[3]]$means <- est_fe[[3]]$means * 100
 est_oc[[3]]$means <- est_oc[[3]]$means * 100
 
