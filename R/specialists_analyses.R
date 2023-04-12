@@ -3,6 +3,7 @@
 library(phytools)
 library(geiger)
 library(caper)
+source("R/function_traitplot2.R")
 
 ## data_preparation
 inv_logit <- function(x) exp(x)/(1 + exp(x))
@@ -63,7 +64,7 @@ mkdelta_fe <- fit_mkdelta(fe$splist, phy_fe)
 # Figure 1
 # requires function "trait.plot2"
 cols <- data.frame(cols = c("white","red"), row.names = 0:1)
-aux_plot <- function(phy, dat, cols, leg = FALSE){
+aux_plot <- function(phy, dat, cols, leg = FALSE, title = ""){
   par(mai = c(0,0,0,0))
   t_spe <- data.frame(Specialist = dat$splist$Specialist, row.names = dat$splist$pm_names)
   cla <- dat$splist$family[match(phy$tip.label, dat$splist$pm_names)]
@@ -72,19 +73,21 @@ aux_plot <- function(phy, dat, cols, leg = FALSE){
     class = cla, margin = 0.45, cex.lab = 0.7, g_lwd = 3, w = 1/30)
   if (leg) legend("bottomleft", fill = cols$cols, 
     legend = c("Nonspecialist","Specialist"), bty = "n")
+  legend("topleft", bty = "n", legend = "", title = title, cex = 2.2, title.col = cols[2,])
 }
 
 cols2 <- c("blue", "green", "black")
+cols2 <- c(4,3,1)
 # png("figures/Fig1_spec.png", width = 480*10, height = 480*10*3, res = 72*15)
 par(mfrow = c(3,1))
 cols <- data.frame(cols = c("white",cols2[1]), row.names = 0:1)
-aux_plot(phy_fe, fe, cols)
+aux_plot(phy_fe, fe, cols, title = "Fens")
 cols <- data.frame(cols = c("white",cols2[2]), row.names = 0:1)
-aux_plot(phy_oc, oc, cols)
+aux_plot(phy_oc, oc, cols, title = "Outcrops")
 cols <- data.frame(cols = c("white",cols2[3]), row.names = 0:1)
-aux_plot(phy_mt, mt, cols)
-legend("bottomleft", fill = cols2, 
-  legend = c("Fen specialist", "Outcrop specialist", "Mountaintop specialist"), bty = "n")
+aux_plot(phy_mt, mt, cols, title = "Mountaintops")
+#legend("bottomleft", fill = cols2, 
+#  legend = c("Fen specialist", "Outcrop specialist", "Mountaintop specialist"), bty = "n")
 
 # H2
 aux_calc_phydist <- function(dat, phy, pool = "spec"){
@@ -131,32 +134,39 @@ round(rbind(apply(pd_fe, 2, extr_fun, fe$ins$TE),
 
 # Figure 2
 cols <- c("blue", "green", "black")
+cols <- c(4,3,1)
 # png("figures/Fig2_phydivers.png", height = 480*10, width = 480*10, res = 72*12.6)
 par(mai = c(0.1,0.55,0.1,0.1), mfrow = c(4,1))
 phyd_ins(pd_fe$SES.phydivers, fe$ins$TE, col = cols[1], -1.4, par("usr")[4])
+text(0.3, -1, "Fens", col = cols[1], cex = 2.2)
 phyd_ins(pd_oc$SES.phydivers, oc$ins$TE, col = cols[2], -1.4, par("usr")[4])
+text(0.3, -1, "Outcrops", col = cols[2], cex = 2.2)
 phyd_ins(pd_mt$SES.phydivers, mt$ins$TE, col = cols[3], 6, par("usr")[4])
+text(7, 0, "Mountaintops", col = cols[3], cex = 2.2)
 plot(range(c(fe$ins$TE, oc$ins$TE, mt$ins$TE)), 0:1, type = "n", ann = FALSE, axes = FALSE)
 axis(1, line = -10, lwd = 0, lwd.tick = 1)
 text(mean(par("usr")[1:2]), 0.85, "Insularity (target effect)")
-par(new = TRUE, mfrow = c(1,1))
-plot(range(c(fe$ins$TE, oc$ins$TE, mt$ins$TE)), 0:1, type = "n", ann = FALSE, axes = FALSE)
-legend(mean(par("usr")[1:2])-1, 0.1, pch = 1, lwd = 1, col = cols, 
-  legend = c("Fens", "Outcrops", "Mountaintops"), bty = "n", cex = 0.7)
+#par(new = TRUE, mfrow = c(1,1))
+#plot(range(c(fe$ins$TE, oc$ins$TE, mt$ins$TE)), 0:1, type = "n", ann = FALSE, axes = FALSE)
+#legend(mean(par("usr")[1:2])-1, 0.1, pch = 1, lwd = 1, col = cols, 
+#  legend = c("Fens", "Outcrops", "Mountaintops"), bty = "n", cex = 0.7)
 
 # Figure S1
 # png("figures/FigS1_phydivers.png", height = 480*10, width = 480*10, res = 72*12.6)
 par(mai = c(0.1,0.55,0.1,0.1), mfrow = c(4,1))
 phyd_ins(pdg_fe$SES.phydivers, fe$ins$TE, col = cols[1], -1.4, par("usr")[4])
+text(0.3, 0, "Fens", col = cols[1], cex = 2.2)
 phyd_ins(pdg_oc$SES.phydivers, oc$ins$TE, col = cols[2], -1.4, par("usr")[4])
+text(0.3, 0, "Outcrops", col = cols[2], cex = 2.2)
 phyd_ins(pdg_mt$SES.phydivers, mt$ins$TE, col = cols[3], 6, par("usr")[4])
+text(7, -1, "Mountaintops", col = cols[3], cex = 2.2)
 plot(range(c(fe$ins$TE, oc$ins$TE, mt$ins$TE)), 0:1, type = "n", ann = FALSE, axes = FALSE)
 axis(1, line = -10, lwd = 0, lwd.tick = 1)
 text(mean(par("usr")[1:2]), 0.85, "Insularity (target effect)")
-par(new = TRUE, mfrow = c(1,1))
-plot(range(c(fe$ins$TE, oc$ins$TE, mt$ins$TE)), 0:1, type = "n", ann = FALSE, axes = FALSE)
-legend(mean(par("usr")[1:2])-1, 0.1, pch = 1, lwd = 1, col = cols, 
-  legend = c("Fens", "Outcrops", "Mountaintops"), bty = "n", cex = 0.7)
+#par(new = TRUE, mfrow = c(1,1))
+#plot(range(c(fe$ins$TE, oc$ins$TE, mt$ins$TE)), 0:1, type = "n", ann = FALSE, axes = FALSE)
+#legend(mean(par("usr")[1:2])-1, 0.1, pch = 1, lwd = 1, col = cols, 
+#  legend = c("Fens", "Outcrops", "Mountaintops"), bty = "n", cex = 0.7)
 
 # Q1
 dclon_fe <- phylo.d(fe$traits[, c("pm_names", "clon")], phy_fe, pm_names, clon, 10000)
@@ -271,24 +281,24 @@ aux_traitplot <- function(pars_fe, pars_oc, pars_mt, ylab){
   aux_mt <- mt$ins$TE
   if (is.null(pars_mt)) aux_mt <- NULL
   plot(range(c(fe$ins$TE, oc$ins$TE, aux_mt)), range(c(pars_fe$means, pars_oc$means, pars_mt$means)), type = "n", axes = FALSE, xlab = "Insularity (target effect)", ylab = ylab)
-  out_fe <- aux_lm_plot(fe$ins$TE, pars_fe$means, col = "blue")
-  out_oc <- aux_lm_plot(oc$ins$TE, pars_oc$means, col = "green")
-  out_mt <- if (!is.null(pars_mt)) aux_lm_plot(mt$ins$TE, pars_mt$means, col = "black") else NULL
+  out_fe <- aux_lm_plot(fe$ins$TE, pars_fe$means, col = 4)
+  out_oc <- aux_lm_plot(oc$ins$TE, pars_oc$means, col = 3)
+  out_mt <- if (!is.null(pars_mt)) aux_lm_plot(mt$ins$TE, pars_mt$means, col = 1) else NULL
   box(bty = "l")
   axis(1)
   axis(2)
   list(FE = out_fe, OC = out_oc, MT = out_mt)
 }
 
-# png("figures/FigS2_traits.png", height = 480*10, width = 480*10, res = 72*13)
+# png("figures/FigS2_traits.png", height = 480*10, width = 480*10, res = 72*12)
 layout(matrix(c(1,1,3,3,5,2,2,4,4,5), nrow = 5))
 par(mai = c(0.7,0.7,0.1,0.1))
 mod_out <- Map(aux_traitplot, est_fe, est_oc, est_mt,
-  c("Clonality", "Number of buds", "Depth of buds [cm]", "Lateral spread [cm]"))
+  c("Proportion of clonal plants", "Number of buds", "Depth of buds [cm]", "Lateral spread [cm]"))
 par(mai = c(0,0,0,0))
 plot(0:1, 0:1, type = "n", axes = FALSE, ann = FALSE)
 legend(0.3,1, pch = c(16, 4), legend = c("None", "Estimated"), title = "Phylogenetic effect", bty = "n", lty = 1:3)
-legend(0.55,1, fill = c("blue", "green", "black"), legend = c("Fens", "Outcrops", "Mountaintops"), title = "Archipelago", bty = "n")
+legend(0.55,1, fill = c(4,3,1), legend = c("Fens", "Outcrops", "Mountaintops"), title = "Archipelago", bty = "n")
 
 ext <- lapply(mod_out, lapply, sapply, function(x) round(c(coef(x)["x", c("Estimate", "Pr(>|t|)")], adjRsq = x$adj.r.squared), 3))
 do.call(cbind, lapply(ext, function(x) x$FE))
