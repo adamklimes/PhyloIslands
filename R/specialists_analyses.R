@@ -205,7 +205,6 @@ sp_fe <- plr(fe, phy_fe, vars)
 sp_oc <- plr(oc, phy_oc, vars)
 sp_mt <- plr(mt, phy_mt, vars, onlyClon = TRUE)
 
-# H3
 calc_com <- function(tr, dat, phy){
   pres <- dat$pres
   splist <- dat$splist
